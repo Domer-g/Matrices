@@ -64,4 +64,12 @@ class Matrix:
     def get_item(self, index: int) -> Any:
         return self.__data[index // self.columns][index % self.columns]
 
+    def transpose(self) -> 'Matrix':
+        return Matrix([[self.__data[j][i] for j in range(self.rows)]  for i in range(self.columns)])
+    
+    def transpose_self(self) -> None:
+        self.__data = [[self.__data[j][i] for j in range(self.rows)]  for i in range(self.columns)]
+        a = self.columns
+        self.columns = self.rows
+        self.rows = a
 

@@ -157,6 +157,9 @@ class Matrix:
 
         return out_string
 
+    def __repr__(self) -> str:
+        return f"{self.rows}x{self.columns} Matrix"
+
     def get_item(self, index: int) -> Any:
         return self.__data[index // self.columns][index % self.columns]
 

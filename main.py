@@ -31,6 +31,7 @@ class Matrix:
         raise ValueError("None arguments given match __init__; Matrix not created")
 
     def __getitem__(self, index: tuple[int|slice, int|slice] | int | slice) -> 'Matrix':
+        """Gets an entry from the matrix, return a Matrix"""
 
         # return while only 'int' given
         if(isinstance(index, int)): return Matrix([[self.get_item(index)]])
@@ -61,6 +62,16 @@ class Matrix:
         raise ValueError("None arguments given match __getitem__; Nothing returned")
     
     def __setitem__(self, index: tuple[int|slice, int|slice] | int | slice, other: 'list[Any] | Any | Matrix' ) -> None:
+        """
+        Allows for setting values
+        [int] - set from index of entry (look iterator)
+        [slice] - sets all tenries to other, or only the slice when given a list
+        [int,int] - sets the given entry to other
+        [int, slice] - sets the row to other
+        [slice, int] - sets the column to other
+
+        other can be a list or a Matrix when using slices 
+        """
         # handle list assignments
         if(isinstance(other, (list, Matrix))):
 
@@ -140,9 +151,11 @@ class Matrix:
         raise ValueError("None arguments given match __setitem__; Nothing set")
 
     def __len__(self) -> int:
+        """Return the number of entries in the matrix"""
         return self.rows*self.columns
     
     def __iter__(self) -> Iterator:
+        """Iterates over all matrix entries starting from A[0,0] and going like this A[0,1], A[0,2]..."""
         for i in range(len(self)):
             yield self.get_item(i)
 

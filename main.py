@@ -146,6 +146,17 @@ class Matrix:
         for i in range(len(self)):
             yield self.get_item(i)
 
+    def __str__(self) -> str:
+        str_max_len: int = max([len(str(i)) for i in self])
+        out_string: str = '|-' + self.columns*str_max_len*' ' + (self.columns-1)*' ' + '-'
+        for  i, elem in enumerate(self):
+            if(i%self.columns == 0): out_string += '|\n| '
+            temp_str = str(elem)
+            out_string += temp_str + (str_max_len - len(temp_str) + 1)*' '
+        out_string += '|\n|-' + self.columns*str_max_len*' ' + (self.columns-1)*' ' + '-|'
+
+        return out_string
+
     def get_item(self, index: int) -> Any:
         return self.__data[index // self.columns][index % self.columns]
 

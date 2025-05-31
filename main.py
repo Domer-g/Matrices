@@ -1,6 +1,12 @@
 from typing import Any, Iterator
 # https://www.pythonmorsels.com/every-dunder-method/#context-managers
 
+def __Matrix_size_check(A: 'Matrix', B: 'Matrix') -> bool:
+    if(A.rows != B.rows): return False
+    if(A.columns != B.columns): return False
+    return True
+
+
 class Matrix:
     def __init__(self, *creation_args: 'int | list[list[Any]] | Matrix') -> None:
         self.rows: int
@@ -147,7 +153,6 @@ class Matrix:
                 self.__data[i][index[0]] = other
             return
 
-
         raise ValueError("None arguments given match __setitem__; Nothing set")
 
     def __len__(self) -> int:
@@ -185,3 +190,91 @@ class Matrix:
         self.columns = self.rows
         self.rows = a
 
+    def __setitem(self, index: int, other: Any) -> None:
+        self.__data[index // self.columns][index % self.columns] = other
+
+    # Arthmetic operations
+    def __add__(self, other: 'Matrix | Any') -> 'Matrix':
+        if(isinstance(other, Matrix)):
+            if(not __Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
+            outcome: Matrix = Matrix(self)
+            for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i)+elem)
+            return outcome
+        
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)+other)
+        return outcome
+    
+    def __sub__(self, other: 'Matrix | Any') -> 'Matrix':
+        if(isinstance(other, Matrix)):
+            if(not __Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
+            outcome: Matrix = Matrix(self)
+            for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i-+elem))
+            return outcome
+        
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)+other)
+        return outcome
+    
+    def __mul__(self, other: 'Matrix | Any') -> 'Matrix':
+        if(isinstance(other, Matrix)):
+            if(self.columns != other.rows): 
+                if(self.columns == other.columns):
+                    print("-------------------- ERROR --------------------\nSECOND MATRIX WAS NOT TRANPOSED!")
+                    other.transpose_self()
+                else:
+                    raise ValueError("Cannot add matrices that are not of the same dimention")
+            outcome: Matrix = Matrix(self.rows, other.columns)
+            other.transpose_self()
+            for i, row_self in enumerate(self.__data):
+                for j, col_other in enumerate(other.__data):
+                    for a, b in zip(row_self, col_other):
+                        outcome.__setitem(i*outcome.columns+j, outcome.get_item(i*outcome.columns+j)+a*b)
+
+            other.transpose_self()
+            return outcome
+        
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)+other)
+        return outcome
+
+    def __truediv__(self, other: Any) -> 'Matrix':     
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)/other)
+        return outcome
+    
+    def __mod__(self, other: Any) -> 'Matrix':     
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)%other)
+        return outcome
+
+    def __floordiv__(self, other: Any) -> 'Matrix':
+        outcome: Matrix = Matrix(self)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i//other))
+        return outcome
+
+    def __pow__(self, other: int) -> 'Matrix':
+        if(self.columns != self.rows): raise ValueError("Cannot rive a non square matrix to a poewer")
+        if(other < 0): raise NotImplementedError("Rising a matrix to a negative power not implemented")
+        if(other == 0): 
+            outecome: Matrix = Matrix(self)
+            outecome[:] = 0
+            for i in range(self.columns): outecome.__setitem(i*outecome.columns, 1)
+            return outecome
+        outecome: Matrix = Matrix(self)
+        other -= 1
+        for i in range(other): outecome *= self
+        return outecome
+    
+    def perform_operation(self, func) -> 'Matrix':
+        """Perform operation from a given function on all its elements and returns other matrix"""
+        outcome: Matrix = Matrix(self)
+        for i, elem in enumerate(outcome):
+            outcome.__setitem(i, func(outcome.get_item(i)))
+        return outcome
+    
+    def perform_operation_self(self, func) -> None:
+        """Perform operation from a given function on all its elements"""
+        for i, elem in enumerate(self):
+            self.__setitem(i, func(self.get_item(i)))
+        return 

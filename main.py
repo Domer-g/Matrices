@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, Iterator
 # https://www.pythonmorsels.com/every-dunder-method/#context-managers
 
 class Matrix:
@@ -141,6 +141,10 @@ class Matrix:
 
     def __len__(self) -> int:
         return self.rows*self.columns
+    
+    def __iter__(self) -> Iterator:
+        for i in range(len(self)):
+            yield self.get_item(i)
 
     def get_item(self, index: int) -> Any:
         return self.__data[index // self.columns][index % self.columns]

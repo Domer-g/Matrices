@@ -1,13 +1,13 @@
 from typing import Any, Iterator
 # https://www.pythonmorsels.com/every-dunder-method/#context-managers
 
-def __Matrix_size_check(A: 'Matrix', B: 'Matrix') -> bool:
-    if(A.rows != B.rows): return False
-    if(A.columns != B.columns): return False
-    return True
-
-
 class Matrix:
+    def __Matrix_size_check(A: 'Matrix', B: 'Matrix') -> bool:
+        if(A.rows != B.rows): return False
+        if(A.columns != B.columns): return False
+        return True
+
+
     def __init__(self, *creation_args: 'int | list[list[Any]] | Matrix') -> None:
         self.rows: int
         self.columns: int
@@ -36,7 +36,7 @@ class Matrix:
         
         raise ValueError("None arguments given match __init__; Matrix not created")
 
-    def __getitem__(self, index: tuple[int|slice, int|slice] | int | slice) -> 'Matrix':
+    def __getitem__(self, index: tuple[int|slice, slice|int] | int | slice) -> 'Matrix':
         """Gets an entry from the matrix, return a Matrix"""
 
         # return while only 'int' given
@@ -150,7 +150,7 @@ class Matrix:
         if(isinstance(index[0], slice) and isinstance(index[1], int)):
             if(index[1] >= self.columns): raise ValueError("Index out of range")
             for i in range(self.rows):
-                self.__data[i][index[0]] = other
+                self.__data[i][index[1]] = other
             return
 
         raise ValueError("None arguments given match __setitem__; Nothing set")
@@ -182,9 +182,11 @@ class Matrix:
         return self.__data[index // self.columns][index % self.columns]
 
     def transpose(self) -> 'Matrix':
+        """Returns a transposed matrix without changing the oryginal"""
         return Matrix([[self.__data[j][i] for j in range(self.rows)]  for i in range(self.columns)])
     
     def transpose_self(self) -> None:
+        """Changes the oryginal matrix to be transposed"""
         self.__data = [[self.__data[j][i] for j in range(self.rows)]  for i in range(self.columns)]
         a = self.columns
         self.columns = self.rows
@@ -196,7 +198,7 @@ class Matrix:
     # Arthmetic operations
     def __add__(self, other: 'Matrix | Any') -> 'Matrix':
         if(isinstance(other, Matrix)):
-            if(not __Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
+            if(not Matrix.__Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
             outcome: Matrix = Matrix(self)
             for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i)+elem)
             return outcome
@@ -207,7 +209,7 @@ class Matrix:
     
     def __sub__(self, other: 'Matrix | Any') -> 'Matrix':
         if(isinstance(other, Matrix)):
-            if(not __Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
+            if(not Matrix.__Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
             outcome: Matrix = Matrix(self)
             for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i-+elem))
             return outcome

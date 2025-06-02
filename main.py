@@ -180,6 +180,9 @@ class Matrix:
 
     def get_item(self, index: int) -> Any:
         return self.__data[index // self.columns][index % self.columns]
+    
+    def get_item2(self, index0: int, index1: int) -> Any:
+        return self.__data[index0][index1]
 
     def transpose(self) -> 'Matrix':
         """Returns a transposed matrix without changing the oryginal"""

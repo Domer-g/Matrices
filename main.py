@@ -41,7 +41,8 @@ class Matrix:
         raise ValueError("None arguments given match __init__; Matrix not created")
 
     def __getitem__(self, index: tuple[int|slice, slice|int] | int | slice) -> 'Matrix | Any':
-        """Gets an entry from the matrix.        
+        """
+        Gets an entry from the matrix.        
         - If (int), returns the stored value at that position. (look iterator for indexing)
         - If (slice), returns a Matrix containing elements of coresponding indecies.
         - If (int, int), returns the stored value at that position.

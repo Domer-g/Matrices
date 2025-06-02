@@ -1,4 +1,3 @@
 # Matrices
-Python Matrix library
-
-currently not working correctly!
+Python Matrices library
+Not shure if working needs testing

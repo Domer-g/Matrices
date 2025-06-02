@@ -22,7 +22,11 @@ class Matrix:
             return
         
         if(isinstance(creation_args[0], Matrix)):
-            creation_args = (creation_args[0].__data,)
+            self.rows = creation_args[0].rows
+            self.columns = creation_args[0].columns
+            self.__data = [ [creation_args[0].__data[i][j] for j in range(self.columns)] for i in range(self.rows) ]
+            return
+
 
         if(isinstance(creation_args[0], list)):
             self.rows = len(creation_args[0])

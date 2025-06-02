@@ -64,5 +64,50 @@ def main():
     print(C)
     return
 
+def GaussJordan(A: Matrix) -> Matrix:
+    # https://www.statlect.com/matrix-algebra/Gauss-Jordan-elimination
 
-main()
+    A = Matrix(A)
+    K: int = A.rows - 1 
+    L: int = A.columns - 1 
+
+    k: int = -1
+    l: int = -1
+
+    i: int = 0
+
+    while(True):
+        k += 1
+        l += 1
+        if(l>L): break
+
+        for i in range(k,K+1): 
+            if(A.get_item2(i,l) != 0): break
+        
+        if(i == K): 
+            k -= 1
+            continue
+
+        if(i != k):
+            temp = A[k,:] 
+            A[k,:] = A[i,:]
+            A[i, :] = temp
+
+        A[k,:] /= A.get_item2(k,l)
+        
+        for i in range(1,K+1):
+            if(i==k): continue
+            A[i,:] -= A[k,:]*A.get_item2(i,l)
+
+        if(k >= K): break
+    return A
+
+
+#main()
+print(GaussJordan(Matrix([
+    [1,2,5,7,9,5,1,10],
+    [46,16,165,16,68,468,1,5],
+    [0,0,0,0,0,0,0,1],
+    [15,15,15,15,15,15,17,0],
+    [1,2,3,4,5,6,7,8]
+])))

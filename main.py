@@ -2,7 +2,7 @@ from typing import Any, Iterator
 # https://www.pythonmorsels.com/every-dunder-method/#context-managers
 
 class Matrix:
-    def __Matrix_size_check(A: 'Matrix', B: 'Matrix') -> bool:
+    def __Matrix_size_check(A: 'Matrix', B: 'Matrix') -> bool: # type: ignore
         if(A.rows != B.rows): return False
         if(A.columns != B.columns): return False
         return True
@@ -36,11 +36,11 @@ class Matrix:
         
         raise ValueError("None arguments given match __init__; Matrix not created")
 
-    def __getitem__(self, index: tuple[int|slice, slice|int] | int | slice) -> 'Matrix':
+    def __getitem__(self, index: tuple[int|slice, slice|int] | int | slice) -> 'Matrix | Any':
         """Gets an entry from the matrix, return a Matrix"""
 
         # return while only 'int' given
-        if(isinstance(index, int)): return Matrix([[self.get_item(index)]])
+        if(isinstance(index, int)): return self.get_item(index)
         
         # return while only 'slice' given
         if(isinstance(index, slice)):
@@ -58,12 +58,12 @@ class Matrix:
                 if(index[1] >= self.columns): raise ValueError("Index out of range")
                 return self[index[0]*self.columns + index[1]]
             if(isinstance(index[1], slice)):
-                return self[ (index[0]*self.columns):((index[0]+1)*self.columns)]
+                return self[ (index[0]*self.columns):((index[0]+1)*self.columns) ]
         
         # return if 'slice, int'
         if(isinstance(index[0], slice) and isinstance(index[1], int)):
             if(index[1] >= self.columns): raise ValueError("Index out of range")
-            return self[ index[1]:(self.columns*self.rows):self.columns]
+            return self[ index[1]:(self.columns*self.rows):self.columns ]
 
         raise ValueError("None arguments given match __getitem__; Nothing returned")
     
@@ -214,11 +214,11 @@ class Matrix:
         if(isinstance(other, Matrix)):
             if(not Matrix.__Matrix_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
             outcome: Matrix = Matrix(self)
-            for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i-+elem))
+            for i, elem in enumerate(other): outcome.__setitem(i, outcome.get_item(i)-elem)
             return outcome
         
         outcome: Matrix = Matrix(self)
-        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)+other)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)-other)
         return outcome
     
     def __mul__(self, other: 'Matrix | Any') -> 'Matrix':
@@ -240,7 +240,7 @@ class Matrix:
             return outcome
         
         outcome: Matrix = Matrix(self)
-        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)+other)
+        for i, _ in enumerate(self): outcome.__setitem(i, outcome.get_item(i)*other)
         return outcome
 
     def __truediv__(self, other: Any) -> 'Matrix':     
@@ -264,7 +264,7 @@ class Matrix:
         if(other == 0): 
             outecome: Matrix = Matrix(self)
             outecome[:] = 0
-            for i in range(self.columns): outecome.__setitem(i*outecome.columns, 1)
+            for i in range(self.columns): outecome.__setitem(i*outecome.columns + i, 1)
             return outecome
         outecome: Matrix = Matrix(self)
         other -= 1

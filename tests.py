@@ -75,6 +75,7 @@ def GaussJordan(A: Matrix) -> Matrix:
     l: int = -1
 
     i: int = 0
+    no_nonzero_rows: bool = False
 
     while(True):
         k += 1
@@ -83,9 +84,11 @@ def GaussJordan(A: Matrix) -> Matrix:
 
         for i in range(k,K+1): 
             if(A.get_item2(i,l) != 0): break
-        
-        if(i == K): 
+            if(i == K): no_nonzero_rows = True
+
+        if(no_nonzero_rows): 
             k -= 1
+            no_nonzero_rows = False
             continue
 
         if(i != k):
@@ -95,7 +98,7 @@ def GaussJordan(A: Matrix) -> Matrix:
 
         A[k,:] /= A.get_item2(k,l)
         
-        for i in range(1,K+1):
+        for i in range(0,K+1):
             if(i==k): continue
             A[i,:] -= A[k,:]*A.get_item2(i,l)
 

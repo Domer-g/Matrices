@@ -1,5 +1,5 @@
+import numpy as np
 from main import *
-
 
 def main():
     cols = 8
@@ -64,53 +64,17 @@ def main():
     print(C)
     return
 
-def GaussJordan(A: Matrix) -> Matrix:
-    # https://www.statlect.com/matrix-algebra/Gauss-Jordan-elimination
+def rank_test():
+    from random import randint
 
-    A = Matrix(A)
-    K: int = A.rows - 1 
-    L: int = A.columns - 1 
+    for i in range(1000):
+        A = Matrix(randint(1,40), randint(1,40))
+        A.perform_operation_self(lambda x: randint(-40,40))
 
-    k: int = -1
-    l: int = -1
-
-    i: int = 0
-    no_nonzero_rows: bool = False
-
-    while(True):
-        k += 1
-        l += 1
-        if(l>L): break
-
-        for i in range(k,K+1): 
-            if(A.get_item2(i,l) != 0): break
-            if(i == K): no_nonzero_rows = True
-
-        if(no_nonzero_rows): 
-            k -= 1
-            no_nonzero_rows = False
-            continue
-
-        if(i != k):
-            temp = A[k,:] 
-            A[k,:] = A[i,:]
-            A[i, :] = temp
-
-        A[k,:] /= A.get_item2(k,l)
+        B:np.matrix = np.matrix(A._Matrix__data) # type: ignore
+        if(np.linalg.matrix_rank(B) != Check_rank(A)):
+            print("WRONG!")
         
-        for i in range(0,K+1):
-            if(i==k): continue
-            A[i,:] -= A[k,:]*A.get_item2(i,l)
-
-        if(k >= K): break
-    return A
-
 
 #main()
-print(GaussJordan(Matrix([
-    [1,2,5,7,9,5,1,10],
-    [46,16,165,16,68,468,1,5],
-    [0,0,0,0,0,0,0,1],
-    [15,15,15,15,15,15,17,0],
-    [1,2,3,4,5,6,7,8]
-])))
+rank_test()

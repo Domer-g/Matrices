@@ -282,3 +282,60 @@ class Matrix:
         for i, elem in enumerate(self):
             self.__set_item(i, func(elem))
         return 
+    
+def GaussJordan(A: Matrix) -> Matrix:
+    # https://www.statlect.com/matrix-algebra/Gauss-Jordan-elimination
+
+    A = Matrix(A)
+    K: int = A.rows - 1 
+    L: int = A.columns - 1 
+
+    k: int = -1
+    l: int = -1
+
+    i: int = 0
+    no_nonzero_rows: bool = False
+
+    while(True):
+        k += 1
+        l += 1
+        if(l>L): break
+
+        for i in range(k,K+1): 
+            if(A.get_item2(i,l) != 0): break
+            if(i == K): no_nonzero_rows = True
+
+        if(no_nonzero_rows): 
+            k -= 1
+            no_nonzero_rows = False
+            continue
+
+        if(i != k):
+            temp = A[k,:] 
+            A[k,:] = A[i,:]
+            A[i, :] = temp
+
+        A[k,:] /= A.get_item2(k,l)
+        
+        for i in range(0,K+1):
+            if(i==k): continue
+            A[i,:] -= A[k,:]*A.get_item2(i,l)
+
+        if(k >= K): break
+    return A
+
+def Check_rank(A: Matrix) -> int:
+    rank: int = 0
+    A = GaussJordan(A)
+    k: int = 0
+    l: int = -1
+    while(True):
+        l += 1
+        if(k > A.rows-1): break
+        if(l > A.columns-1): break
+
+        if(A[k,l] == 1):
+            k += 1
+            rank += 1
+
+    return rank

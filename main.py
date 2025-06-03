@@ -55,8 +55,8 @@ class Matrix:
         
         # return while only 'slice' given; returns matrix
         if(isinstance(index, slice)):
-            start = index.start if (index.step != None) else 0
-            stop = index.stop if (index.step != None) else len(self)
+            start = index.start if (index.start != None) else 0
+            stop = index.stop if (index.stop != None) else len(self)
             step = index.step if (index.step != None) else 1
             return Matrix([[ self.get_item(i) for i in range(start, stop, step) ]])
 
@@ -87,8 +87,8 @@ class Matrix:
 
             # set while only 'slice' given
             if(isinstance(index, slice)):
-                start = index.start
-                stop = index.stop
+                start = index.start if (index.start != None) else 0
+                stop = index.stop if (index.stop != None) else len(self)
                 step = index.step if (index.step != None) else 1
 
                 if(abs(stop-start) != len(other)-1): raise ValueError("List length missmatch")
@@ -126,8 +126,8 @@ class Matrix:
             if((index.start == None) and (index.stop == None) and (index.step == None)):
                 self.__data = [ [other for j in range(self.columns)] for i in range(self.rows) ]
                 return
-            start = index.start if (index.step != None) else 0
-            stop = index.stop if (index.step != None) else len(self)
+            start = index.start if (index.start != None) else 0
+            stop = index.stop if (index.stop != None) else len(self)
             step = index.step if (index.step != None) else 1
             for i in range(start, stop, step):
                 self.__set_item(i, other)

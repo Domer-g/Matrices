@@ -2,6 +2,8 @@ from typing import Any, Iterator
 # https://www.pythonmorsels.com/every-dunder-method/#context-managers
 
 class Matrix:
+    ShowMulTransposeError: bool = True 
+
     def __Matrix_same_size_check(A: 'Matrix', B: 'Matrix') -> bool: # type: ignore
         if(A.rows != B.rows): return False
         if(A.columns != B.columns): return False
@@ -62,14 +64,14 @@ class Matrix:
 
         if(not isinstance(index, tuple)): raise ValueError("None arguments given match __getitem__; Nothing returned")
 
-        # return if 'int, slice' or 'int, int'
+        # return if 'int, slice'(matrix) or 'int, int'(any)
         if(isinstance(index[0], int)):
             if(isinstance(index[1], int)): return self.get_item2(index[0], index[1])
-            if(isinstance(index[1], slice)): return self[ (index[0]*self.columns):((index[0]+1)*self.columns) ]
+            if(isinstance(index[1], slice)): return Matrix([[ self.get_item2(index[0], i) for i in range(self.columns) ]])
         
-        # return if 'slice, int'
+        # return if 'slice, int'(matrix); column
         if(isinstance(index[0], slice) and isinstance(index[1], int)): 
-            return self[ index[1]:(self.columns*self.rows):self.columns ]
+            return Matrix([[ self.get_item2(i, index[1]) for i in range(self.rows) ]])
 
         raise ValueError("None arguments given match __getitem__; Nothing returned")
     
@@ -82,7 +84,7 @@ class Matrix:
         - [int, slice] - sets the row to other. List/matrix or any
         - [slice, int] - sets the column to other. List/matrix or any
         """
-        # handle list assignments
+        # handle list and matrix assignments
         if(isinstance(other, (list, Matrix))):
 
             # set while only 'slice' given
@@ -99,17 +101,16 @@ class Matrix:
             # set if 'int, slice'
             if(not isinstance(index, tuple)): raise ValueError("None arguments given match __setitem__; Nothing set")
             
+            # set if 'int, slice'
             if(isinstance(index[0], int) and isinstance(index[1], slice)):
                 if(len(other) != self.columns): raise ValueError("List length missmatch")
-                for i in range(self.columns):
-                    self.__data[index[0]][i] = other[i]
+                for i in range(self.columns): self.__data[index[0]][i] = other[i]
                 return
             
             # set if 'slice, int'
             if(isinstance(index[0], slice) and isinstance(index[1], int)):
                 if(len(other) != self.rows): raise ValueError("List length missmatch")
-                for i in range(self.rows):
-                    self.__data[i][index[1]] = other[i]
+                for i in range(self.rows): self.__data[i][index[1]] = other[i]
                 return 
 
             raise ValueError("None arguments given match __setitem__; Nothing set")
@@ -159,8 +160,7 @@ class Matrix:
     
     def __iter__(self) -> Iterator:
         """Iterates over all matrix entries starting from A[0,0] and going like this A[0,1], A[0,2]..."""
-        for i in range(len(self)):
-            yield self.get_item(i)
+        for i in range(len(self)): yield self.get_item(i)
 
     def __str__(self) -> str:
         str_max_len: int = max([len(str(i)) for i in self])
@@ -214,7 +214,7 @@ class Matrix:
         outcome: Matrix = Matrix(self)
         if(isinstance(other, Matrix)):
             if(not Matrix.__Matrix_same_size_check(self, other)): raise ValueError("Cannot add matrices that are not of the same dimention")
-            for i, elem in enumerate(other): outcome.__set_item(i, outcome.get_item(i)-elem)
+            for i, elem in enumerate(other): outcome.__set_item(i, outcome.get_item(i) - elem)
             return outcome
         
         for i in range(len(self)): outcome.__set_item(i, outcome[i] - other)
@@ -224,7 +224,7 @@ class Matrix:
         if(isinstance(other, Matrix)):
             if(self.columns != other.rows): 
                 if(self.columns == other.columns):
-                    print("-------------------- ERROR --------------------\nSECOND MATRIX WAS NOT TRANPOSED!")
+                    if(Matrix.ShowMulTransposeError): print("-------------------- ERROR --------------------\nSECOND MATRIX WAS NOT TRANPOSED!")
                     other.transpose_self()
                 else:
                     raise ValueError("Cannot add matrices that are not of the same dimention")
@@ -240,26 +240,26 @@ class Matrix:
             return outcome
         
         outcome: Matrix = Matrix(self)
-        for i, elem in enumerate(outcome): outcome.__set_item(i, elem*other)
+        for i, elem in enumerate(outcome): outcome.__set_item(i, elem * other)
         return outcome
 
     def __truediv__(self, other: Any) -> 'Matrix':     
         outcome: Matrix = Matrix(self)
-        for i, elem in enumerate(outcome): outcome.__set_item(i, elem/other)
+        for i, elem in enumerate(outcome): outcome.__set_item(i, elem / other)
         return outcome
     
     def __mod__(self, other: Any) -> 'Matrix':     
         outcome: Matrix = Matrix(self)
-        for i, elem in enumerate(outcome): outcome.__set_item(i, elem%other)
+        for i, elem in enumerate(outcome): outcome.__set_item(i, elem % other)
         return outcome
 
     def __floordiv__(self, other: Any) -> 'Matrix':
         outcome: Matrix = Matrix(self)
-        for i, elem in enumerate(outcome): outcome.__set_item(i, elem//other)
+        for i, elem in enumerate(outcome): outcome.__set_item(i, elem // other)
         return outcome
 
     def __pow__(self, other: int) -> 'Matrix':
-        if(self.columns != self.rows): raise ValueError("Cannot rive a non square matrix to a poewer")
+        if(self.columns != self.rows): raise ValueError("Cannot rise a non square matrix to a poewer")
         if(other < 0): raise NotImplementedError("Rising a matrix to a negative power not implemented")
         if(other == 0): 
             outecome: Matrix = Matrix(self.rows, self.columns)
